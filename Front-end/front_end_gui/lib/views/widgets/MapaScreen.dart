@@ -4,6 +4,8 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:developer';
 
 class MapaScreen extends StatefulWidget {
+  const MapaScreen({super.key});
+
 
   @override
   _MapaScreenState createState() => _MapaScreenState();
@@ -12,7 +14,7 @@ class MapaScreen extends StatefulWidget {
 class _MapaScreenState extends State<MapaScreen> {
 
   GoogleMapController? _mapController;
-  Set<Polyline> _polylines = {};
+  final Set<Polyline> _polylines = {};
   final GoogleMapServices _mapsService = GoogleMapServices();
 
   // Coordenadas de ejemplo

@@ -3,8 +3,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import 'package:front_end_gui/config/api_config.dart';
 import 'package:front_end_gui/views/infraestructure/inputs/inputs.dart';
-import 'package:front_end_gui/views/infraestructure/inputs/passwordLogin.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // Para convertir el JSON
 import 'dart:developer';
@@ -18,47 +18,73 @@ class RegisterCubit extends Cubit<RegisterState> {
  
 
   // Métodos en el cubic de las variables del formulario
-  Future<void> onSubmit() async {
+  Future<bool> onSubmit() async {
     log('Estado actual formulario al enviarlo, antes de emitir emit -> ${state.formStatus}');
     log('Enviando formulario... datos -> email: ${state.email.value}, contraseña: ${state.password.value}');
-    emit( // Notifica a flutter blog que el estado ha cambiado
-      state.copyWith(  // hace una copia del estado actual, pero con algunos valores modificados
-        formStatus : FormStatus.validating, // Se indica que el estado de las validaciones es 'validando'
-        email : GmailInput.dirty(value : state.email.value),
-        password : PasswordLoginInput.dirty( value: state.password.value),
-        //icono: state.isValid ? Icons.check : Icons.error,
-        
-        isValid: Formz.validate([
-          state.email,
-          state.password, 
-        ])
-      ),
-      
-    ); 
+    
+    emit(state.copyWith(
+      formStatus: FormStatus.validating,
+      email: GmailInput.dirty(value: state.email.value),
+      password: PasswordLoginInput.dirty(value: state.password.value),
+      isValid: Formz.validate([state.email, state.password])
+    ));
 
-
+    final client = http.Client();
+    const timeout = Duration(seconds: 30);
+    
     try {
-      final url = Uri.parse('https://tu-api.com');
-
-      final response = await http.post(
-        url,
-        headers: {},
-        body: jsonEncode({
-          'email': state.email.value,
-          'password': state.password.value
-        })
-      );
-
-      if (response.statusCode == 200){
-        log('Se inicia sesión...');
+      // Usar la URL de la configuración de la API
+      final loginUrl = Uri.parse(ApiConfig.login);
+      log('🔄 Intentando conectar a: $loginUrl');
+      
+      final requestData = {
+        'username': state.email.value,
+        'password': state.password.value
+      };
+      
+      log('📤 Enviando credenciales de inicio de sesión...');
+      
+      try {
+        final response = await client.post(
+          loginUrl,
+          headers: {
+            'Content-Type': 'application/json; charset=UTF-8',
+            'Accept': 'application/json',
+            'Connection': 'keep-alive',
+          },
+          body: jsonEncode(requestData),
+        ).timeout(timeout);
         
-      } else {
-        log('Error en la autenticación -> ${response.statusCode} /  ${FormStatus.failHttp}',);
-        emit(state.copyWith(formStatus:  FormStatus.failHttp));
+        log('✅ Respuesta recibida - Código: ${response.statusCode}');
+        log('📝 Cuerpo de la respuesta: ${response.body}');
+        
+        if (response.statusCode == 200) {
+          log('✅ Inicio de sesión exitoso');
+          emit(state.copyWith(formStatus: FormStatus.valid));
+          return true;
+        } else {
+          log('❌ Error en la autenticación -> ${response.statusCode}');
+          log('📝 Detalles del error: ${response.body}');
+          emit(state.copyWith(formStatus: FormStatus.failHttp));
+          return false;
+        }
+      } on http.ClientException catch (e) {
+        log('❌ Error de conexión: $e');
+        emit(state.copyWith(formStatus: FormStatus.failHttp));
+        return false;
+      } on Exception catch (e) {
+        log('❌ Error inesperado: $e');
+        emit(state.copyWith(formStatus: FormStatus.failHttp));
+        return false;
       }
-    } catch (e) {
-      log('Error durante petición Http');
-      //emit(state.copyWith(formStatus: FormStatus.failHttp));
+    } catch (e, stackTrace) {
+      log('❌ Error inesperado durante el inicio de sesión: $e');
+      log('Stack trace: $stackTrace');
+      emit(state.copyWith(formStatus: FormStatus.failHttp));
+      return false;
+    } finally {
+      client.close();
+      log('🔌 Cliente HTTP cerrado');
     }
   }
 

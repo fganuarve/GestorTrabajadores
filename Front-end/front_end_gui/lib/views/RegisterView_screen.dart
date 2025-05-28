@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end_gui/views/cubit/RegisterCubit.dart';
 import 'package:front_end_gui/views/widgets/Custom_Text_FormField.dart';
 import 'package:front_end_gui/views/SignUp_screen.dart';
-import 'package:front_end_gui/views/Home_screen.dart';
 
 /// Pantalla creada para mostrar al usuario el login a la aplicación
 /// Vista formada por widget con orden en forma de columna, en el cual se le
@@ -123,16 +122,31 @@ class RegisterForm extends StatelessWidget {
             width: screenWidth * 0.5,
             
             child: FilledButton.tonalIcon(
-              onPressed: stateForm
-                ? () {
-                  registerCubit.onSubmit();
-                  Navigator.pushReplacement(
-                    context, 
-                    MaterialPageRoute(builder: (context) => HomeScreen()));
+              onPressed: stateForm && !isLoading
+                ? () async {
+                    final success = await registerCubit.onSubmit();
+                    if (success && context.mounted) {
+                      // Show success message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('¡Registro exitoso! Por favor inicia sesión.'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                      // Navigate back to login screen
+                      Navigator.pop(context);
+                    } else if (context.mounted) {
+                      // Show error message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Error en el registro. Por favor, inténtalo de nuevo.'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
                   }
                 : null,
 
-              //icon:  const Icon(Icons.save),
               label: isLoading
                 ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2.0, strokeAlign: BorderSide.strokeAlignInside,) 
                 :  Text('Iniciar sesión', style: TextStyle( fontSize: screenWidth * 0.045)),

@@ -1,30 +1,27 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:front_end_gui/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('Login screen has email and password fields', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    await tester.pumpWidget(const MyApp(initialRoute: '/'));
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verify that login screen is shown
+    expect(find.text('Iniciar Sesión'), findsOneWidget);
+    expect(find.byType(TextFormField), findsNWidgets(2)); // Email and password fields
+    expect(find.text('¿No tienes una cuenta? Regístrate'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+  testWidgets('Can navigate to register screen', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp(initialRoute: '/'));
+    
+    // Tap the register button
+    await tester.tap(find.text('¿No tienes una cuenta? Regístrate'));
+    await tester.pumpAndSettle();
+    
+    // Verify that register screen is shown
+    expect(find.text('Registro de Trabajador'), findsOneWidget);
+    expect(find.byType(TextFormField), findsNWidgets(6)); // All form fields
   });
 }

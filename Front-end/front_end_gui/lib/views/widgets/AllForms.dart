@@ -6,6 +6,8 @@ import 'package:front_end_gui/views/widgets/Custom_Text_FormField.dart';
 import 'package:front_end_gui/views/widgets/TelefonoInputFormatter.dart';
 
 class PersonalFirstForm extends StatefulWidget {
+  const PersonalFirstForm({super.key});
+
   @override
   _PersonalFirstForm createState() => _PersonalFirstForm();
 }
@@ -132,6 +134,8 @@ class _PersonalFirstForm extends State<PersonalFirstForm> {
 
 
 class ProfesionalFirstForm extends StatefulWidget {
+  const ProfesionalFirstForm({super.key});
+
   @override
   _ProfesionalFirstForm createState() => _ProfesionalFirstForm();
 }
@@ -145,7 +149,7 @@ class _ProfesionalFirstForm extends State<ProfesionalFirstForm> {
   String? _seleccionPuesto;
   String? _preferenciaHoraria;
 
-  List<String> _puestoTrabajo = ['TCAE','Enfermero','Médico'];
+  final List<String> _puestoTrabajo = ['TCAE','Enfermero','Médico'];
 
 
   @override
@@ -341,6 +345,8 @@ class _ProfesionalFirstForm extends State<ProfesionalFirstForm> {
 
 
 class CreateUserForm extends StatefulWidget {
+  const CreateUserForm({super.key});
+
   @override
   _CreateUserForm createState() => _CreateUserForm();
 }

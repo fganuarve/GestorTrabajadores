@@ -1,45 +1,39 @@
 import 'package:flutter/material.dart';
-import 'package:front_end_gui/config/theme/app_theme.dart';
-import 'package:front_end_gui/views/RegisterView_screen.dart';
-import 'package:front_end_gui/views/cubit/SignUpCubit.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:front_end_gui/views/cubit/SignUpCubit2.dart';
-import 'package:intl/date_symbol_data_local.dart';
-
-/// Fichero principal de la aplicación que contiene nuestra aplicación
-
+import 'package:front_end_gui/cubit/auth_cubit.dart';
+import 'package:front_end_gui/views/auth/login_screen.dart';
+import 'package:front_end_gui/views/auth/register_screen.dart';
+import 'package:front_end_gui/views/home_screen_new.dart' as home_screen;
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Asegura la inicialización correcta
-  await initializeDateFormatting('es_ES', null); // Inicializa la localización en español
-
-runApp(
-  MultiBlocProvider(
-      providers: [
-        BlocProvider(create: (context) => SignUpCubit()),
-        BlocProvider(create: (context) => SignUpCubit2())
-      ],
-      
-      child: const MyApp(),
-    ));
+  WidgetsFlutterBinding.ensureInitialized();
+  // Always start with login screen
+  runApp(const MyApp(initialRoute: '/'));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String initialRoute;
+
+  const MyApp({Key? key, required this.initialRoute}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme(selectionColor: 0).theme(),
-      title: 'Turn App',
-      home: Scaffold(
-
-          ///appBar: AppBar(//title: const Text('Nuevo usuario'),),
-          body: RegisterView()
-          // añadir vista
-
-          ),
+    return BlocProvider(
+      create: (context) => AuthCubit(),
+      child: MaterialApp(
+        title: 'Gestor de Trabajadores',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        initialRoute: initialRoute,
+        routes: {
+          '/': (context) => const LoginScreen(),
+          '/register': (context) => const RegisterScreen(),
+          '/home': (context) => const home_screen.HomeScreen(),
+        },
+      ),
     );
   }
 }

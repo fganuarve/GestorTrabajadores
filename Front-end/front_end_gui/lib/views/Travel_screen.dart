@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:front_end_gui/views/widgets/MapaScreen.dart';
 
 class TravelScreen extends StatefulWidget {
+  const TravelScreen({super.key});
+
  
 
   @override
