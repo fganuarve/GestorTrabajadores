@@ -34,6 +34,34 @@ public class GenericResponse<T> {
      */
     public GenericResponse() {
     }
+    
+    /**
+     * Constructor con datos de respuesta.
+     * @param data Los datos de la respuesta exitosa
+     */
+    public GenericResponse(T data) {
+        this.data = data;
+        this.error = null;
+    }
+    
+    /**
+     * Constructor con error.
+     * @param error Los detalles del error
+     */
+    public GenericResponse(ErrorResponse error) {
+        this.data = null;
+        this.error = error;
+    }
+    
+    /**
+     * Constructor con datos y error.
+     * @param data Los datos de la respuesta
+     * @param error Los detalles del error (puede ser null)
+     */
+    public GenericResponse(T data, ErrorResponse error) {
+        this.data = data;
+        this.error = error;
+    }
 
 
     /**

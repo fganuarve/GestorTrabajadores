@@ -5,7 +5,7 @@ import com.calendario.trabajadores.model.database.EventoCalendario;
 import com.calendario.trabajadores.model.dto.calendario.*;
 
 @Mapper(componentModel = "spring")
-public interface ICalendarioMapper {
+public interface IEventoCalendarioMapper {
 
     // Mapea EventoCalendario a CrearEditarEventoResponse (para respuestas genéricas)
     CrearEditarEventoResponse eventoToCrearEditarEventoResponse(EventoCalendario evento);

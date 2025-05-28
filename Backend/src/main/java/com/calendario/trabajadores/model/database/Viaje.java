@@ -17,7 +17,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@Table(name = "viajes")
+@Table(name = "viaje")
 @NoArgsConstructor//Constructor vacio
 @AllArgsConstructor//Constructor con todos los atributos
 public class Viaje extends CamposComunes {

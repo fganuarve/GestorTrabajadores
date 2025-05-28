@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:front_end_gui/services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,17 +9,44 @@ part 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final AuthService _authService;
+  final SharedPreferences _prefs;
 
-  AuthCubit({AuthService? authService})
-      : _authService = authService ?? AuthService(),
-        super(AuthInitial());
+  AuthCubit({
+    AuthService? authService,
+    required SharedPreferences prefs,
+  })  : _authService = authService ?? AuthService(),
+        _prefs = prefs,
+        super(AuthInitial()) {
+    // Check if user is already logged in
+    _checkAuthStatus();
+  }
+  
+  void _checkAuthStatus() {
+    final token = _prefs.getString('auth_token');
+    final userData = _prefs.getString('user_data');
+    
+    if (token != null && userData != null) {
+      try {
+        final userMap = Map<String, dynamic>.from(jsonDecode(userData));
+        emit(AuthAuthenticated(
+          token: token,
+          userData: userMap,
+        ));
+      } catch (e) {
+        debugPrint('Error parsing user data: $e');
+        emit(AuthUnauthenticated());
+      }
+    } else {
+      emit(AuthUnauthenticated());
+    }
+  }
 
   Future<void> register({
     required String email,
     required String password,
     required String fullName,
     required String workplace,
-    required String role,
+    required String role, // Se mantiene como 'role' para el backend
     required String location,
     String? phoneNumber,
   }) async {
@@ -30,7 +59,7 @@ class AuthCubit extends Cubit<AuthState> {
         password: password,
         fullName: fullName,
         workplace: workplace,
-        role: role,
+        role: role, // Se envía como 'role' al backend
         location: location,
         phoneNumber: phoneNumber,
       );
@@ -57,50 +86,34 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> login(String email, String password) async {
     try {
       emit(AuthLoading());
-      print('Iniciando proceso de login para: $email');
+      debugPrint('Iniciando proceso de login para: $email');
       
       final result = await _authService.login(email, password);
-      print('Resultado del login: $result');
+      debugPrint('Resultado del login: $result');
       
       if (result['success'] == true) {
         final token = result['token'];
         final userData = result['user'];
         
         if (token != null && userData != null) {
+          // Convertir userData a Map si es necesario
+          final userMap = userData is Map<String, dynamic> 
+              ? userData 
+              : Map<String, dynamic>.from(userData as Map);
+          
           // Guardar el token y los datos del usuario en SharedPreferences
-          final prefs = await SharedPreferences.getInstance();
+          await _prefs.setString('auth_token', token);
+          await _prefs.setString('user_data', jsonEncode(userMap));
           
-          // Guardar el token de autenticación
-          await prefs.setString('auth_token', token);
+          debugPrint('Datos de usuario guardados correctamente');
           
-          // Guardar los datos del usuario
-          if (userData['id'] != null) {
-            await prefs.setString('user_id', userData['id'].toString());
-          }
+          // Emitir estado autenticado con los datos del usuario
+          emit(AuthAuthenticated(
+            token: token,
+            userData: userMap,
+          ));
           
-          // Guardar datos básicos del usuario
-          await prefs.setString('user_name', userData['nombre']?.toString() ?? 'Usuario');
-          await prefs.setString('user_last_name', userData['apellido1']?.toString() ?? '');
-          await prefs.setString('user_role', userData['rol']?.toString() ?? 'user');
-          
-          // Guardar el email si está disponible
-          if (userData['email'] != null) {
-            await prefs.setString('user_email', userData['email'].toString());
-          }
-          
-          // Guardar datos adicionales del perfil
-          if (userData['telefono'] != null) {
-            await prefs.setString('user_phone', userData['telefono'].toString());
-          }
-          if (userData['centroTrabajo'] != null) {
-            await prefs.setString('user_workplace', userData['centroTrabajo'].toString());
-          }
-          if (userData['localidad'] != null) {
-            await prefs.setString('user_location', userData['localidad'].toString());
-          }
-          
-          print('Login exitoso. Token y datos de usuario guardados.');
-          emit(AuthAuthenticated(token: token, userData: userData));
+          // Los datos ya se guardaron en SharedPreferences
         } else {
           print('Error: Token nulo en la respuesta exitosa');
           emit(const AuthError(message: 'Error en la autenticación: token no proporcionado'));
@@ -119,7 +132,32 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
+  Future<void> signOut() async {
+    try {
+      emit(AuthLoading());
+      // Limpiar cualquier dato de sesión local
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('auth_token');
+      await prefs.remove('user_id');
+      await prefs.remove('user_name');
+      await prefs.remove('user_last_name');
+      await prefs.remove('user_role');
+      await prefs.remove('user_email');
+      await prefs.remove('user_phone');
+      await prefs.remove('user_workplace');
+      await prefs.remove('user_location');
+      
+      // Emitir estado de no autenticado
+      emit(AuthUnauthenticated());
+    } catch (e) {
+      print('Error al cerrar sesión: $e');
+      emit(AuthError(message: 'Error al cerrar la sesión'));
+    }
+  }
+  
+  // Método obsoleto, mantener para compatibilidad
+  @Deprecated('Use signOut() instead')
   void logout() {
-    emit(AuthUnauthenticated());
+    signOut();
   }
 }

@@ -17,10 +17,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _workplaceController = TextEditingController();
   final _locationController = TextEditingController();
   final _phoneController = TextEditingController();
-  String? _selectedRole;
+  String? _selectedPuesto;
 
-  // Asegurarse de que los roles coincidan exactamente con los del backend
-  final List<String> _roles = ['MEDICO', 'ENFERMERO', 'TCAE'];
+  // Lista de puestos disponibles
+  final List<String> _puestos = ['MEDICO', 'ENFERMERO', 'TCAE'];
+  
+  // Mapa para mostrar nombres más amigables al usuario
+  final Map<String, String> _nombresPuestos = {
+    'MEDICO': 'Médico',
+    'ENFERMERO': 'Enfermero/a',
+    'TCAE': 'Técnico en Cuidados de Enfermería'
+  };
 
   @override
   void dispose() {
@@ -111,21 +118,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       labelText: 'Rol',
                       prefixIcon: Icon(Icons.work),
                     ),
-                    value: _selectedRole,
-                    items: _roles.map((role) {
+                    value: _selectedPuesto,
+                    items: _puestos.map((puesto) {
                       return DropdownMenuItem(
-                        value: role,
-                        child: Text(role),
+                        value: puesto,
+                        child: Text(_nombresPuestos[puesto] ?? puesto),
                       );
                     }).toList(),
                     onChanged: (value) {
                       setState(() {
-                        _selectedRole = value;
+                        _selectedPuesto = value;
                       });
                     },
                     validator: (value) {
                       if (value == null) {
-                        return 'Por favor selecciona tu rol';
+                        return 'Por favor selecciona tu puesto';
                       }
                       return null;
                     },
@@ -178,7 +185,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                     password: _passwordController.text,
                                     fullName: _fullNameController.text.trim(),
                                     workplace: _workplaceController.text.trim(),
-                                    role: _selectedRole!,
+                                    role: _selectedPuesto!,
                                     location: _locationController.text.trim(),
                                     phoneNumber: _phoneController.text.trim().isNotEmpty
                                         ? _phoneController.text.trim()

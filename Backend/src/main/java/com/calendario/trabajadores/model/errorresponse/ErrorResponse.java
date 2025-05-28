@@ -46,6 +46,13 @@ public class ErrorResponse {
         //No se especifica el tipo de excepción
         this.exceptionType = "";
     }
+    
+    //Constructor con código de error, mensaje y código de estado HTTP
+    public ErrorResponse(String status, String message, int httpStatus) {
+        this.status = status;
+        this.message = message;
+        this.exceptionType = "";
+    }
 
 }
 

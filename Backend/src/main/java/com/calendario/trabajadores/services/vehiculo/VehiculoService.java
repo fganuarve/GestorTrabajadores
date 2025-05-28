@@ -150,6 +150,21 @@ public class VehiculoService {
         return responseWrapper;
     }
 
+    public GenericResponse<String> eliminarVehiculo(Long id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'eliminarVehiculo'");
+    }
+
+    public GenericResponse<CrearEditarVehiculoResponse> obtenerVehiculoPorMatricula(String matricula) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'obtenerVehiculoPorMatricula'");
+    }
+
+    public GenericResponse<CrearEditarVehiculoResponse> obtenerVehiculoPorId(Long id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'obtenerVehiculoPorId'");
+    }
+
 
 
 }

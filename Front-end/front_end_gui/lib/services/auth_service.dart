@@ -83,7 +83,18 @@ class AuthService {
         if (response.statusCode == 200 && responseData['success'] == true) {
           // Registro exitoso
           print('Usuario registrado con éxito');
-          return {'success': true};
+          // Devolvemos los datos del usuario incluyendo el puesto
+          return {
+            'success': true,
+            'user': {
+              'email': email,
+              'fullName': fullName,
+              'puesto': normalizedRole,
+              'workplace': workplace,
+              'location': location,
+              if (phoneNumber != null && phoneNumber.isNotEmpty) 'phoneNumber': phoneNumber,
+            }
+          };
         } else {
           // Error en el registro
           final errorMessage = responseData['error']?['message'] ?? 'Error en el registro';
@@ -145,12 +156,22 @@ class AuthService {
           final token = response.headers['authorization'] ?? 
                        response.headers['Authorization'];
           
+          // Obtener los datos del usuario
+          Map<String, dynamic> userData = {};
+          if (data['data'] != null) {
+            userData = Map<String, dynamic>.from(data['data']);
+            // Asegurarnos de que el campo 'puesto' esté presente
+            if (userData['puesto'] == null && userData['role'] != null) {
+              userData['puesto'] = userData['role'];
+            }
+          }
+          
           if (token != null) {
             print('Token JWT recibido en la cabecera');
             return {
               'success': true, 
               'token': token.replaceAll('Bearer ', ''),
-              'user': data['data']
+              'user': userData
             };
           } 
           // Si no está en la cabecera, verificar si está en el cuerpo
@@ -159,23 +180,23 @@ class AuthService {
             return {
               'success': true, 
               'token': data['token'],
-              'user': data['data']
+              'user': userData
             };
           } 
           // Si no hay token en ningún lado pero la respuesta es exitosa
           // y tiene datos de usuario, asumimos que la autenticación fue exitosa
-          else if (data['success'] == true && data['data'] != null) {
+          else if (data['success'] == true && userData.isNotEmpty) {
             print('Inicio de sesión exitoso sin token JWT');
             // Usamos un token local para mantener la sesión
-            final userId = data['data']['id']?.toString() ?? '';
-            final userEmail = data['data']['email']?.toString() ?? '';
+            final userId = userData['id']?.toString() ?? '';
+            final userEmail = userData['email']?.toString() ?? '';
             final token = 'local_token_${userId}_${userEmail}';
             
             print('Token local generado: $token');
             return {
               'success': true,
               'token': token,
-              'user': data['data']
+              'user': userData
             };
           } 
           else {

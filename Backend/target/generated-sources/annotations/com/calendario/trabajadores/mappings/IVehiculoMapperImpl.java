@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-04-19T13:37:19+0200",
-    comments = "version: 1.6.3, compiler: javac, environment: Java 17.0.12 (Microsoft)"
+    date = "2025-05-28T23:48:43+0200",
+    comments = "version: 1.6.3, compiler: Eclipse JDT (IDE) 3.42.0.v20250514-1000, environment: Java 21.0.7 (Eclipse Adoptium)"
 )
 @Component
 public class IVehiculoMapperImpl implements IVehiculoMapper {
@@ -28,14 +28,14 @@ public class IVehiculoMapperImpl implements IVehiculoMapper {
 
         CrearEditarVehiculoResponse crearEditarVehiculoResponse = new CrearEditarVehiculoResponse();
 
-        crearEditarVehiculoResponse.setId( vehiculoDB.getId() );
-        crearEditarVehiculoResponse.setModeloCoche( vehiculoDB.getModeloCoche() );
-        crearEditarVehiculoResponse.setMatricula( vehiculoDB.getMatricula() );
-        crearEditarVehiculoResponse.setPlazas( vehiculoDB.getPlazas() );
-        crearEditarVehiculoResponse.setUsuario( usuarioToUsuarioVehiculosResponse( vehiculoDB.getUsuario() ) );
         crearEditarVehiculoResponse.setActivo( vehiculoDB.getActivo() );
         crearEditarVehiculoResponse.setFechaCreacion( vehiculoDB.getFechaCreacion() );
         crearEditarVehiculoResponse.setFechaModificacion( vehiculoDB.getFechaModificacion() );
+        crearEditarVehiculoResponse.setId( vehiculoDB.getId() );
+        crearEditarVehiculoResponse.setMatricula( vehiculoDB.getMatricula() );
+        crearEditarVehiculoResponse.setModeloCoche( vehiculoDB.getModeloCoche() );
+        crearEditarVehiculoResponse.setPlazas( vehiculoDB.getPlazas() );
+        crearEditarVehiculoResponse.setUsuario( usuarioToUsuarioVehiculosResponse( vehiculoDB.getUsuario() ) );
 
         return crearEditarVehiculoResponse;
     }
@@ -49,12 +49,12 @@ public class IVehiculoMapperImpl implements IVehiculoMapper {
         Vehiculo vehiculo = new Vehiculo();
 
         vehiculo.setUsuario( crearVehiculoRequestToUsuario( request ) );
-        vehiculo.setModeloCoche( request.getModeloCoche() );
+        vehiculo.setActivo( request.getActivo() );
         vehiculo.setMatricula( request.getMatricula() );
+        vehiculo.setModeloCoche( request.getModeloCoche() );
         if ( request.getPlazas() != null ) {
             vehiculo.setPlazas( request.getPlazas() );
         }
-        vehiculo.setActivo( request.getActivo() );
 
         return vehiculo;
     }
@@ -68,13 +68,13 @@ public class IVehiculoMapperImpl implements IVehiculoMapper {
         Vehiculo vehiculo = new Vehiculo();
 
         vehiculo.setUsuario( editarVehiculoRequestToUsuario( request ) );
+        vehiculo.setActivo( request.getActivo() );
         vehiculo.setId( request.getId() );
-        vehiculo.setModeloCoche( request.getModeloCoche() );
         vehiculo.setMatricula( request.getMatricula() );
+        vehiculo.setModeloCoche( request.getModeloCoche() );
         if ( request.getPlazas() != null ) {
             vehiculo.setPlazas( request.getPlazas() );
         }
-        vehiculo.setActivo( request.getActivo() );
 
         return vehiculo;
     }
@@ -86,15 +86,15 @@ public class IVehiculoMapperImpl implements IVehiculoMapper {
 
         VehiculoDTO vehiculoDTO = new VehiculoDTO();
 
+        vehiculoDTO.setCreadoPor( vehiculo.getCreadoPor() );
         vehiculoDTO.setFechaCreacion( vehiculo.getFechaCreacion() );
         vehiculoDTO.setFechaModificacion( vehiculo.getFechaModificacion() );
-        vehiculoDTO.setCreadoPor( vehiculo.getCreadoPor() );
         vehiculoDTO.setModificadoPor( vehiculo.getModificadoPor() );
-        vehiculoDTO.setId( vehiculo.getId() );
-        vehiculoDTO.setModeloCoche( vehiculo.getModeloCoche() );
-        vehiculoDTO.setMatricula( vehiculo.getMatricula() );
-        vehiculoDTO.setPlazas( vehiculo.getPlazas() );
         vehiculoDTO.setActivo( vehiculo.getActivo() );
+        vehiculoDTO.setId( vehiculo.getId() );
+        vehiculoDTO.setMatricula( vehiculo.getMatricula() );
+        vehiculoDTO.setModeloCoche( vehiculo.getModeloCoche() );
+        vehiculoDTO.setPlazas( vehiculo.getPlazas() );
 
         return vehiculoDTO;
     }
@@ -119,13 +119,13 @@ public class IVehiculoMapperImpl implements IVehiculoMapper {
 
         UsuarioVehiculosResponse usuarioVehiculosResponse = new UsuarioVehiculosResponse();
 
-        usuarioVehiculosResponse.setId( usuario.getId() );
-        usuarioVehiculosResponse.setNombre( usuario.getNombre() );
+        usuarioVehiculosResponse.setActivo( usuario.getActivo() );
         usuarioVehiculosResponse.setApellido1( usuario.getApellido1() );
         usuarioVehiculosResponse.setApellido2( usuario.getApellido2() );
         usuarioVehiculosResponse.setEmail( usuario.getEmail() );
+        usuarioVehiculosResponse.setId( usuario.getId() );
+        usuarioVehiculosResponse.setNombre( usuario.getNombre() );
         usuarioVehiculosResponse.setVehiculos( vehiculoListToVehiculoDTOList( usuario.getVehiculos() ) );
-        usuarioVehiculosResponse.setActivo( usuario.getActivo() );
 
         return usuarioVehiculosResponse;
     }
