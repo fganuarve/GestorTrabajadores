@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:front_end_gui/cubit/auth_cubit.dart';
 import 'package:front_end_gui/views/auth/login_screen.dart';
 import 'package:front_end_gui/views/auth/register_screen.dart';
-import 'package:front_end_gui/views/home_screen_new.dart' as home_screen;
+import 'package:front_end_gui/views/home_screen.dart' as home_screen;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
